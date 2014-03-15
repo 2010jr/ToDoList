@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+		<head>
+				<title>ToDoList</title>
+				<link rel="stylesheet" href="../bootstrap-3.1.1-dist/css/bootstrap.min.css">
+				<link rel="stylesheet" href="../silviomoreto-bootstrap-select-ad009c8/bootstrap-select.min.css">
+				<link rel="stylesheet" href="../jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
+				<script type="text/javascript" src="../js/jquery-2.1.0.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../bootstrap-3.1.1-dist/js/bootstrap.min.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../silviomoreto-bootstrap-select-ad009c8/bootstrap-select.min.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../js/db_utils.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../js/view_utils.js" charset="utf-8"></script>
+				<script type="text/javascript" src="../js/date_utils.js" charset="utf-8"></script>
+		</head>
+		</head>
+		<boby onload="withDB()">
+		<p>test</p>
+		<button onClick="insertDB()">Add</button>
+		<button onClick="deleteDB()">DeleteDatabase</button>
+		<button onClick="readAll()">ReadAll</button>
+		<button onClick="readByIndex('Project','project')">ReadByIndex</button>
+		<button onClick="update()">Update</button>
+		<div id="main_todo"></div>
+		<div class="container">
+				<div class="col-md-12">
+						<div class="row">
+								<div class="col-md-6">
+										<textarea class="form-control" rows="2" id="title_todo" placeholder="input text"></textarea>
+								</div>
+								<div class="col-md-3">
+										<select class="selectpicker" data-live-search="true" id="project_todo">
+												<option>CbD</option>
+												<option>CBRR</option>
+												<option>OSS</option>
+												<option>GGSA</option>
+										</select>
+								</div>
+								<div class="col-md-2">
+										<input type="text" id="duedate_todo" class="datepicker input-small" placeholder="DueDate"></input>
+								</div>
+								<div class="col-md-1">
+										<button type="button" class="btn btn-success" id="regist_todo">add</button>
+								</div>
+						</div>
+						</div> <div class="span9">
+						<div class="row">
+								<div class="col-md-1">1</div>
+								<div class="col-md-1">2</div>
+						</div>
+				</div>
+		</div>
+</div>
+	</body>
+</html>
