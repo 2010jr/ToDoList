@@ -31,35 +31,32 @@ jQuery(function($) {
 		}
 		
 		//TODOリスト全体を表示するロジック
-		function create_todolist(data_list) {
-				var class_list = ["col-md-1","col-md-1","col-md-1","col-md-1","col-md-1","col-md-1"];
+		function create_todolist(data) {
 				var html_str = [];
-				html_str.push("<div class='container'><div class='col-md-9'><div class='row'>");
-				for ( var i = 0 ; i < 2 ; i++) {
-						var context = "<div class=" + class_list[i] + ">";
-						//context += data_list[i].title;
-						context += "test";
-						context += "</div>";
-						html_str.push(context);
-				}
-				html_str.push("</div></div></div>");
+				html_str.push("<div class='col-md-9'><div class='row'>");
+				html_str.push(data["title"]);
+				html_str.push("</div></div>");
 				return html_str.join("");
 		}
 
 		//DBからToDoオブジェクトを全て取得し、TODOリストを表示する
-		function view_todolist(selector) {
-			var data_list = readAll();
-			var todo_html = create_todolist(data_list); 
-			$(selector).html(todo_html);
+		function view_todolist(data_list) {
+			var todo_html = create_todolist(data_list);
+			$(this.selector).append(todo_html);
 		}
 			
-		//入力された情報を取得して登録する	
+		//入力された情報を取得して登録する
+		//TextAreaに入力された先頭行はtitleとして入力	
 		function extract_todo_info(text_sel,project_sel,duedate_sel) {
 			//入力項目を取得する
 			var text_val= $(text_sel).val();
 			var project_val = $(project_sel).val();
 			var duedate_val = $(duedate_sel).val();
-			var data = {"title" : title_val, "project" : project_val, "duedate" : duedate_val};
+			var text_result = text_val.split(/[\r]|[\n]|[\r\n]/);
+			var title_index = text_val.match(/[\r]|[\n]|[\r\n]/);
+			var title_val = text_result[0];
+			var comment_val= text_val.substring(title_index.index + 1);
+			var data = {"title" : title_val, "comment" : comment_val, "project" : project_val, "duedate" : duedate_val};
 			return data;
 		}	
 
@@ -70,7 +67,9 @@ jQuery(function($) {
 		}
 
 		//入力された情報を取得する登録
-		view_todolist("#main_todo");
+		var content_value = { selector : "#main_todo"};
+		var content_show_func = view_todolist.bind(content_value);
+	    readAll(content_show_func);	
 		$("#regist_todo").bind("click",{text_sel : "#title_todo", project_sel : "#project_todo", duedate_sel : "#duedate_todo"},regist_todo);
 		//Date入力の設定
 		$(".datepicker").datepicker();

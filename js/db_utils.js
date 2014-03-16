@@ -80,7 +80,7 @@ function update(key,property,value) {
 }
 
 //全てのオブジェクトを読み込み表示する
-function readAll() {
+function readAll(func) {
 		console.log("invoked readAll");
 		withDB(function(db) {
 				var transaction = db.transaction(DB_NAME);
@@ -89,8 +89,10 @@ function readAll() {
 				var request = store.openCursor();
 				request.onsuccess = function(e) {
 						var cursor = e.target.result;
-						var data_list = parseCursor(cursor);
-						printConsole(data_list);
+						var data = parseCursor(cursor);
+						if(typeof data !== "undefined") {
+								func(data);
+						}
 				};
 		});
 }
@@ -108,8 +110,8 @@ function readByIndex(search_index,search_value) {
 			var request = index.openCursor(range);
 			request.onsuccess = function(e) {
 					var cursor = e.target.result;
-					var data_list = parseCursor(cursor);
-					printConsole(data_list);
+					var data = parseCursor(cursor);
+					printConsole(data);
 			};
 	});
 }
@@ -140,13 +142,12 @@ function readByRange(search_index,search_value_from,search_value_to,lowerOpen,up
 }	
 
 function parseCursor(cursor) {
-	var data_list = [];
+	var data;
 	if (cursor) {
-		var data = cursor.value;
-		data_list.push(data);
+		data = cursor.value;
 		cursor.continue();
 	}
-	return data_list;
+	return data;
 }
 
 function printConsole(data) {
