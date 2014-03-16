@@ -89,16 +89,13 @@ function readAll(func) {
 				var request = store.openCursor();
 				request.onsuccess = function(e) {
 						var cursor = e.target.result;
-						var data = parseCursor(cursor);
-						if(typeof data !== "undefined") {
-								func(data);
-						}
+						var data = apply_to_result(cursor,func);
 				};
 		});
 }
 
 //あるIndexの値に一致する項目のみ取得する
-function readByIndex(search_index,search_value) {
+function readByIndex(search_index,search_value,func) {
 	console.log("invoke readByIndex");
 	withDB(function(db) {
 			var range = IDBKeyRange.only(search_value);
@@ -110,13 +107,12 @@ function readByIndex(search_index,search_value) {
 			var request = index.openCursor(range);
 			request.onsuccess = function(e) {
 					var cursor = e.target.result;
-					var data = parseCursor(cursor);
-					printConsole(data);
+					var data = apply_to_result(cursor,func);
 			};
 	});
 }
 //ある範囲を検索
-function readByRange(search_index,search_value_from,search_value_to,lowerOpen,upperOpen) {
+function readByRange(search_index,search_value_from,search_value_to,lowerOpen,upperOpen,func) {
 		console.log("invoke readByRange");
 		withDB(function(db) {
 				var range;
@@ -135,19 +131,20 @@ function readByRange(search_index,search_value_from,search_value_to,lowerOpen,up
 
 				request.onsuccess = function (e) {
 						var cursor = e.target.result;
-						var data_list = parseCursor(cursor);
-						printConsole(data_list);
+						var data_list = apply_to_result(cursor,func);
 				};
 		});
 }	
 
-function parseCursor(cursor) {
-	var data;
+//検索
+function apply_to_result(cursor,func) {
 	if (cursor) {
 		data = cursor.value;
+		if (typeof func !== "undefined") {
+				func(data);	
+		}
 		cursor.continue();
 	}
-	return data;
 }
 
 function printConsole(data) {
@@ -162,6 +159,20 @@ function printConsole(data) {
 	}
 }
 
+function deleteObject(id) {
+		console.log("invoke deleteObject");
+		withDB(function(db) {
+			var transaction = db.transaction(DB_NAME);
+			var store = transaction.objectStore(DB_NAME);
+
+			var request = store.delete(id);
+			request.onsuccess = function(e) {
+				console.log("delete object Success!! id: " + id);
+			};
+			
+			request.onerror = logerror;
+		});
+}	
 
 function deleteDB() {
 		var request = indexedDB.deleteDatabase(DB_NAME);

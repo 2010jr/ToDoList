@@ -7,36 +7,21 @@ jQuery(function($) {
 		//4.期限（いつやるか）
 		//5.依頼者
 		//6.時間計測ボタン群
-		function create_todo_list (data) {
-				var element_list = [];
-				var $check_button = $('<button/>', {
-						value: "check",
-					click: update(data["id"],"status","DONE")
-				}).wrapInner("<td/>");
-				var $title = $('<div/>', {
-						text:data["title"]
-				}).wrapInner("<td/>");
-				var $project = $('<div/>', {
-						text:data["project"]
-				}).wrapInner("<td/>");
-				var $duedate = $('<div/>', {
-						text:data["duedate"]
-				}).wrapInner("<td/>");
-				var $button_start =  $('<button/>',{
-						value: start,
-					click: function() {alert("start");}
-				}).wrapInner("<td/>");
-				//各要素の結合
-				return	$check_button.append($title).append($project).append($duedate).append($button_start).wrapInner("<tr/>");		
+		function create_todolist_element (data) {
+				var html_check = "<button class=col-md-1>i</button>";
+				var html_title = "<div class=col-md-6>" + data["title"] + "</div>";
+				var html_project = "<div class=col-md-2>" + data["project"] + "</div>";
+				var html_duedate = "<div class=col-md-2>" + data["duedate"] + "</div>";
+				var html_start = "<button class=col-md-1>" + data["duedate"] + "</button>";
+				var html_todo = html_check + html_title + html_project + html_duedate + html_start;  
+				return html_todo;	
 		}
 		
 		//TODOリスト全体を表示するロジック
 		function create_todolist(data) {
 				var html_str = [];
-				html_str.push("<div class='col-md-9'><div class='row'>");
-				html_str.push(data["title"]);
-				html_str.push("</div></div>");
-				return html_str.join("");
+				var html_str_test = create_todolist_element(data);
+				return html_str_test;
 		}
 
 		//DBからToDoオブジェクトを全て取得し、TODOリストを表示する
@@ -55,7 +40,10 @@ jQuery(function($) {
 			var text_result = text_val.split(/[\r]|[\n]|[\r\n]/);
 			var title_index = text_val.match(/[\r]|[\n]|[\r\n]/);
 			var title_val = text_result[0];
-			var comment_val= text_val.substring(title_index.index + 1);
+			var comment_val = "";
+			if(title_index) {
+					comment_val= text_val.substring(title_index.index + 1);
+			}
 			var data = {"title" : title_val, "comment" : comment_val, "project" : project_val, "duedate" : duedate_val};
 			return data;
 		}	
