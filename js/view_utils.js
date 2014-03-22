@@ -1,22 +1,63 @@
 jQuery(function($) {
 		$('.selectpicker').selectpicker();
-		//TODOリストのDOM<tr>を作成
-		//項目は6項目
+		//TODOリストのDOMを作成
+		//項目は以下6項目
+		//注意：ボタンのイベントは未登録（全て登録後に最後にバインドする)
 		//1.チェックボタン
 		//2.テキスト項目&プロジェクト項目（TODO内容を記述）
 		//4.期限（いつやるか）
 		//5.依頼者
 		//6.時間計測ボタン群
 		function create_todolist_element (data) {
-				var html_check = "<button class=col-md-1>i</button>";
-				var html_title = "<div class=col-md-6>" + data["title"] + "</div>";
-				var html_project = "<div class=col-md-2>" + data["project"] + "</div>";
-				var html_duedate = "<div class=col-md-2>" + data["duedate"] + "</div>";
-				var html_start = "<button class=col-md-1>" + data["duedate"] + "</button>";
+				var id = data["id"];
+				var status = data["status"];
+				var html_check = "<div status=" + status + " class='row'><div class='col-md-1'><button name=check data_id=" + id + " class='btn btn-default btn-small " + status + "'><i class='glyphicon glyphicon-unchecked'></i></button></div>";
+				var html_title = "<div id=title_" + id + " data_id=" + id + " class='col-md-6'>" + data["title"] + "</div>";
+				var html_project = "<div name=project data_id=" + id + " class=col-md-2>" + data["project"] + "</div>";
+				var html_duedate = "<div name=duedate data_id=" + id + " class=col-md-1>" + data["duedate"] + "</div>";
+				var html_start_button = "<button type=button name=start data_id=" + id + " class='btn btn-info btn-small'><i class='glyphicon glyphicon-play'></i> </button>";
+				var html_pause_button = "<button type=button name=pause data_id=" + id + " class='btn btn-info btn-small'><i class='glyphicon glyphicon-pause'></i> </button>";
+				var html_delete_button = "<button type=button name=delete data_id=" + id + " class='btn btn-info btn-small'><i class='glyphicon glyphicon-remove-circle'></i> </button>";
+				var html_start = "<div class=col-md-2>" + html_start_button + html_pause_button + html_delete_button + "</div></div>";
 				var html_todo = html_check + html_title + html_project + html_duedate + html_start;  
 				return html_todo;	
 		}
 		
+		//選択されたDOMのステータス更新を行う
+		function update_status(before,after) {
+				console.log("invoke update_status_view_db");
+				var id = $(this).attr("name");
+				alert(id);
+				//ステータスにより表示形式を変更する。
+				var $todo = $("#todo_" + id);
+				$todo.removeClass().addClass("btn btn-small done");
+				//DBにステータス更新を反映する
+				console.log("update db");
+		}
+		//チェックボックスがチェックされた場合の処理を記述	
+		function check_func() {
+			//アイコンをチェック済みとする
+			var $row = $(this).parent().parent();
+			var status_before = $row.attr("status");
+			$(this).find("i").removeClass("glyphicon-unchecked").addClass("glyphicon-check");
+		    //画面上のステータス更新	
+			$row.attr("status","done");
+			$(this).removeClass().addClass("btn btn-small done");
+			//ボタンの非活性化	
+			$row.find("button[name]").attr("disabled", "disabled");
+			//DBヘの登録
+			var id = parseInt($(this).attr("data_id"),10);
+			update(id,"status","done");
+		}		
+		function start_func() {
+			alert("invoke start_func");
+		}
+		function end_func() {
+			alert("invoke start_func");
+		}
+		function bind_button_event() {
+			$("button[name=check]").on('click',check_func);
+		}
 		//TODOリスト全体を表示するロジック
 		function create_todolist(data) {
 				var html_str = [];
@@ -25,7 +66,7 @@ jQuery(function($) {
 		}
 
 		//DBからToDoオブジェクトを全て取得し、TODOリストを表示する
-		function view_todolist(data_list) {
+		function append_todolist(data_list) {
 			var todo_html = create_todolist(data_list);
 			$(this.selector).append(todo_html);
 		}
@@ -44,7 +85,7 @@ jQuery(function($) {
 			if(title_index) {
 					comment_val= text_val.substring(title_index.index + 1);
 			}
-			var data = {"title" : title_val, "comment" : comment_val, "project" : project_val, "duedate" : duedate_val};
+			var data = {"title" : title_val, "comment" : comment_val, "project" : project_val, "duedate" : duedate_val, "status" : "undone"};
 			return data;
 		}	
 
@@ -54,10 +95,13 @@ jQuery(function($) {
 				alert("success register");
 		}
 
-		//入力された情報を取得する登録
-		var content_value = { selector : "#main_todo"};
-		var content_show_func = view_todolist.bind(content_value);
-	    readAll(content_show_func);	
+		function show_todo_list(selector) {
+				//入力された情報を取得する登録
+				var content_value = {"selector" : selector};
+				var append_todolist_func = append_todolist.bind(content_value);
+				readAll(append_todolist_func,bind_button_event);	
+		}
+		show_todo_list("#main_todo");
 		$("#regist_todo").bind("click",{text_sel : "#title_todo", project_sel : "#project_todo", duedate_sel : "#duedate_todo"},regist_todo);
 		//Date入力の設定
 		$(".datepicker").datepicker();

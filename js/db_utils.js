@@ -46,7 +46,9 @@ function insertDB(data) {
 				var request = store.add({
 						"createdate" : new Date().getTime(),
 						"project" : data["project"],
-				   		"title" : data["title"]	
+				   		"title" : data["title"],
+						"duedate" : data["duedate"],
+						"status" : data["status"]
 				});
 				request.onsuccess = function(e) {
 						console.log("succeed to create");
@@ -80,7 +82,7 @@ function update(key,property,value) {
 }
 
 //全てのオブジェクトを読み込み表示する
-function readAll(func) {
+function readAll(func, func_end) {
 		console.log("invoked readAll");
 		withDB(function(db) {
 				var transaction = db.transaction(DB_NAME);
@@ -89,13 +91,13 @@ function readAll(func) {
 				var request = store.openCursor();
 				request.onsuccess = function(e) {
 						var cursor = e.target.result;
-						var data = apply_to_result(cursor,func);
+						var data = apply_to_result(cursor,func,func_end);
 				};
 		});
 }
 
 //あるIndexの値に一致する項目のみ取得する
-function readByIndex(search_index,search_value,func) {
+function readByIndex(search_index,search_value,func,func_end) {
 	console.log("invoke readByIndex");
 	withDB(function(db) {
 			var range = IDBKeyRange.only(search_value);
@@ -107,12 +109,12 @@ function readByIndex(search_index,search_value,func) {
 			var request = index.openCursor(range);
 			request.onsuccess = function(e) {
 					var cursor = e.target.result;
-					var data = apply_to_result(cursor,func);
+					var data = apply_to_result(cursor,func,func_end);
 			};
 	});
 }
 //ある範囲を検索
-function readByRange(search_index,search_value_from,search_value_to,lowerOpen,upperOpen,func) {
+function readByRange(search_index,search_value_from,search_value_to,lowerOpen,upperOpen,func,func_end) {
 		console.log("invoke readByRange");
 		withDB(function(db) {
 				var range;
@@ -131,19 +133,24 @@ function readByRange(search_index,search_value_from,search_value_to,lowerOpen,up
 
 				request.onsuccess = function (e) {
 						var cursor = e.target.result;
-						var data_list = apply_to_result(cursor,func);
+						var data_list = apply_to_result(cursor,func,func_end);
 				};
 		});
 }	
 
 //検索
-function apply_to_result(cursor,func) {
+function apply_to_result(cursor,func,func_end) {
 	if (cursor) {
 		data = cursor.value;
 		if (typeof func !== "undefined") {
 				func(data);	
 		}
 		cursor.continue();
+	} else {
+			//カーソル全て終わった後の処理
+			if (typeof func_end !== "undefined") {
+					func_end();
+			}
 	}
 }
 
