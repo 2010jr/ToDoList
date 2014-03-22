@@ -1,0 +1,22 @@
+.undone {
+		background-color : ; 
+}
+.overduedate {
+		background-color : #d9534f;
+}
+
+.doing {
+		background-color : #428bca;
+}
+
+.waiting {
+		background-color : #f0ad4e;
+}
+
+.done {
+		background-color : #5cb85c;
+}
+
+.discard {
+		background-color : #C0C0C0;
+}
