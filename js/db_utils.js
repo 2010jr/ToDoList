@@ -37,7 +37,8 @@ function withDB(f) {
 		};
 }
 
-function insertDB(data) {
+//DB挿入。挿入後の処理をfuncに指定
+function insertDB(data,func) {
 		alert("invoke insert");
 		withDB(function(db) {
 				alert("invoke insert function");
@@ -52,12 +53,19 @@ function insertDB(data) {
 				});
 				request.onsuccess = function(e) {
 						console.log("succeed to create");
+						if (typeof func !== "undefined") {
+								func();
+						}
 				};
 				request.onerror = logerror;
 		});
 }
 
-function update(key,property,value) {
+
+//キーと更新するプロパティとそのバリューを指定して更新する（一つのプロパティの更新を行う）
+//オプションとして単一オブジェクトの更新or配列の更新（要素の追加）が指定が可能
+//デフォルトは単一オブジェクトの更新
+function update(key,property,value,single_or_array) {
 		console.log("invoke update");
 		withDB(function(db) {
 				var store = db.transaction(DB_NAME,"readwrite").objectStore(DB_NAME);
@@ -66,7 +74,16 @@ function update(key,property,value) {
 				request_get.onsuccess = function (e_get) {
 						var data = e_get.target.result;
 						if(typeof data !== "undefined") {
-								data[property] = value;
+								if(typeof single_or_array === "undefined" || single_or_array === "single") {
+										data[property] = value;
+								} else if (single_or_array === "array") {
+										//初期設定の場合
+										if(typeof data[property] === "undefined") {
+												data[property] = [value];
+										} else {
+												data[property].push(value);
+										}
+								}
 						} else {
 								alert("data is not found");
 								return;

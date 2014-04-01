@@ -1,5 +1,7 @@
 .undone {
-		background-color : ; 
+		color: #333;
+		background-color: #fff;
+		border-color: #ccc;
 }
 .overduedate {
 		background-color : #d9534f;
@@ -17,6 +19,6 @@
 		background-color : #5cb85c;
 }
 
-.discard {
+.discarded {
 		background-color : #C0C0C0;
 }
