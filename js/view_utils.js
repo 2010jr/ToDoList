@@ -25,10 +25,9 @@ jQuery(function($) {
 						start_pause_icon = "glyphicon glyphicon-pause";
 				}
 				var html_check = "<div class='col-md-1'><button name=check data_id=" + id + " class='btn btn-small " + status + "' " + disabled_attr + "><i class='glyphicon " + check_icon + "'></i></button></div>";
-				console.log("disabled FLG is " + html_check);
 				var html_title = "<div id=title_" + id + " data_id=" + id + " class='col-md-6'>" + data["title"] + "</div>";
 				var html_project = "<div name=project data_id=" + id + " class=col-md-2>" + data["project"] + "</div>";
-				var html_duedate = "<div name=duedate data_id=" + id + " class=col-md-1>" + data["duedate"] + "</div>";
+				var html_duedate = "<div name=duedate data_id=" + id + " class=col-md-1>" + moment(data["duedate"]).format("YYYY/MM/DD") + "</div>";
 				var html_start_button = "<button type=button name=start data_id=" + id + " class='btn btn-small btn-default'" + disabled_attr + "><i class='" + start_pause_icon + "'></i> </button>";
 				var html_delete_button = "<button type=button name=delete data_id=" + id + " class='btn btn-small btn-default'" + disabled_attr + "><i class='glyphicon glyphicon-remove-circle'></i> </button>";
 				var html_start = "<div class=col-md-2>" + html_start_button + html_delete_button + "</div></div>";
@@ -140,7 +139,7 @@ jQuery(function($) {
 			//入力項目を取得する
 			var text_val= $(text_sel).val();
 			var project_val = $(project_sel).val();
-			var duedate_val = $(duedate_sel).val();
+			var duedate_val = new Date($(duedate_sel).val());
 			var text_result = text_val.split(/[\r]|[\n]|[\r\n]/);
 			var title_index = text_val.match(/[\r]|[\n]|[\r\n]/);
 			var title_val = text_result[0];
@@ -151,12 +150,12 @@ jQuery(function($) {
 			var data = {"title" : title_val, "comment" : comment_val, "project" : project_val, "duedate" : duedate_val, "status" : "undone"};
 			return data;
 		}	
-
+		
+		//TODO項目を追加し、ページリロードする
 		function regist_todo(event) {
 				var data = extract_todo_info(event.data.text_sel, event.data.project_sel, event.data.duedate_sel);
-				var content_value = "#main_todo";
-				var read_func = show_todo_list.bind(null, content_value);
-				insertDB(data,read_func);
+				var reload_func = function() { location.reload(); return 1;};
+				insertDB(data,reload_func);
 		}
 
 		function show_todo_list(selector) {
@@ -165,10 +164,18 @@ jQuery(function($) {
 				var append_todolist_func = append_todolist.bind(content_value);
 				readAll(append_todolist_func,bind_button_event);	
 		}
+		//ステータスに応じて処理を取得するための情報
+		function show_todo_list_not_completed(selector) {
+				var content_value = {"selector" : selector};
+				var append_todolist_func = append_todolist.bind(content_value);
+				readByIndex("Status","undone",append_todolist_func,bind_button_event);	
+		}
+
 		//初期表示
 		show_todo_list("#main_todo");
 		$("#regist_todo").bind("click",{text_sel : "#title_todo", project_sel : "#project_todo", duedate_sel : "#duedate_todo"},regist_todo);
-
+		
+		$("#show_status").click(function() {$("#main_todo").empty();show_todo_list_not_completed("#main_todo");});
 		//Date入力の設定
 		$(".datepicker").datepicker();
 		$(".datepicker").datepicker("option","dateFormat",'yy/mm/dd');

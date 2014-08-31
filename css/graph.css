@@ -1,0 +1,57 @@
+.axis path,
+.axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering:crispEdges;
+}
+
+.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+}
+
+.axis_no_line path,
+.axis_no_line line {
+		fill: none;
+		stroke: black;
+		shape-rendering:crispEdges;
+}
+
+.axis_no_line text {
+		font-family: sans-serif;
+		font-size: 11px;
+}
+
+.status_undone {
+	   fill : 	#333;
+	   stroke :  #333;
+	   stroke-width : 0;
+}
+
+.status_overduedate {
+	   fill : 	#d9534f;
+	   stroke :  #d9534f;
+	   stroke-width : 0;
+}
+
+.status_doing {
+	   fill : 	#428bca;
+	   stroke :  #428bca;
+	   stroke-width : 0;
+}
+.status_waiting {
+	   fill : 	#f0ad4e;
+	   stroke :  #d9534f;
+	   stroke-width : 0;
+}
+.status_done {
+	   fill : 	#5cb85c;
+	   stroke :  #d9534f;
+	   stroke-width : 0;
+}
+
+.status_discard {
+	   fill : 	#C0C0C0;
+	   stroke :  #C0C0C0;
+	   stroke-width : 0;
+}
