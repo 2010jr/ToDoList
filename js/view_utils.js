@@ -165,17 +165,22 @@ jQuery(function($) {
 				readAll(append_todolist_func,bind_button_event);	
 		}
 		//ステータスに応じて処理を取得するための情報
-		function show_todo_list_not_completed(selector) {
+		function show_todo_list_by_status(selector, status_value) {
 				var content_value = {"selector" : selector};
 				var append_todolist_func = append_todolist.bind(content_value);
-				readByIndex("Status","undone",append_todolist_func,bind_button_event);	
+				readByIndex("Status",status_value,append_todolist_func,bind_button_event);	
 		}
 
 		//初期表示
 		show_todo_list("#main_todo");
 		$("#regist_todo").bind("click",{text_sel : "#title_todo", project_sel : "#project_todo", duedate_sel : "#duedate_todo"},regist_todo);
+
+	    $("#status_search").bind("change",function() { 
+				$("#main_todo").empty();
+				show_todo_list_by_status("#main_todo", $(this).val());
+		});
+
 		
-		$("#show_status").click(function() {$("#main_todo").empty();show_todo_list_not_completed("#main_todo");});
 		//Date入力の設定
 		$(".datepicker").datepicker();
 		$(".datepicker").datepicker("option","dateFormat",'yy/mm/dd');

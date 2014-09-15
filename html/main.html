@@ -18,9 +18,16 @@
 				<script type="text/javascript" src="../js/date_utils.js" charset="utf-8"></script>
 		</head>
 		<body onload="withDB()">
-		<button onClick="deleteDB()">DeleteDatabase</button>
 		<a class="btn btn-info" href="graph.html">Analysis</a>
-		<button type="button" class="btn btn-info" id="show_status">ShowByStatus</button>
+		<select class="selectpicker" data-live-search="true" id="status_search">
+				<option value="undone">UnDone</option>
+				<option value="">All</option>
+				<option value="done">Done</option>
+				<option value="doing">Doing</option>
+				<option value="waiting">Waiting</option>
+				<option value="overduedate">OverDue</option>
+		</select>
+		</select>
 		<div class="container">
 				<div class="col-md-12">
 						<div class="row">
