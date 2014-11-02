@@ -1,8 +1,17 @@
 
+
 function create_gantt(data_list) {
-		w = 1000;
-		h = 500;
-		padding = 100;
+	var w = 1000,
+		h = 500,
+		padding = 100,
+		svg,
+		xScale,
+		yScale,
+		xAxis,
+		yAxis,
+		rect_radius = 10,
+		rect_data;
+
 
 		svg = d3.select("body")
 				.append("svg")
