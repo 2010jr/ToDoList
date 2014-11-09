@@ -9,8 +9,8 @@ jQuery(function($) {
 		//5.依頼者
 		//6.時間計測ボタン群
 		function create_todolist_element (data) {
-				var id = data["id"],
-					status = data["status"],
+				var id = data['id'],
+					status = data['status'],
 					html_row = "<div status=" + status + " class='row'>",
 					disabled_attr = "",
 					check_icon = "glyphicon-unchecked",
@@ -34,9 +34,9 @@ jQuery(function($) {
 						start_pause_icon = "glyphicon glyphicon-pause";
 				}
 				html_check = "<div class='col-md-1'><button name=check data_id=" + id + " class='btn btn-small " + status + "' " + disabled_attr + "><i class='glyphicon " + check_icon + "'></i></button></div>";
-				html_title = "<div id=title_" + id + " data_id=" + id + " class='col-md-6'>" + data["title"] + "</div>";
-				html_project = "<div name=project data_id=" + id + " class=col-md-2>" + data["project"] + "</div>";
-				html_duedate = "<div name=duedate data_id=" + id + " class=col-md-1>" + moment(data["duedate"]).format("YYYY/MM/DD") + "</div>";
+				html_title = "<div id=title_" + id + " data_id=" + id + " class='col-md-6'>" + data['title'] + "</div>";
+				html_project = "<div name=project data_id=" + id + " class=col-md-2>" + data['project'] + "</div>";
+				html_duedate = "<div name=duedate data_id=" + id + " class=col-md-1>" + moment(data['duedate']).format("YYYY/MM/DD") + "</div>";
 				html_start_button = "<button type=button name=start data_id=" + id + " class='btn btn-small btn-default'" + disabled_attr + "><i class='" + start_pause_icon + "'></i> </button>";
 				html_delete_button = "<button type=button name=delete data_id=" + id + " class='btn btn-small btn-default'" + disabled_attr + "><i class='glyphicon glyphicon-remove-circle'></i> </button>";
 				html_start = "<div class=col-md-2>" + html_start_button + html_delete_button + "</div></div>";

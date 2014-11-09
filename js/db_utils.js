@@ -46,10 +46,10 @@ function insertDB(data,func) {
 				store = transaction.objectStore(DB_NAME),
 				request = store.add({
 						"createdate" : new Date().getTime(),
-				"project" : data["project"],
-				"title" : data["title"],
-				"duedate" : data["duedate"],
-				"status" : data["status"]
+				"project" : data['project'],
+				"title" : data['title'],
+				"duedate" : data['duedate'],
+				"status" : data['status']
 				});
 		request.onsuccess = function(e) {
 				console.log("succeed to create");
