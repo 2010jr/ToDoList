@@ -59,12 +59,12 @@ jQuery(function($) {
 			//ボタンの非活性化	
 			$row.find("button[name]").attr("disabled", "disabled");
 			//DBヘの登録
-			update(id,"status","done");
+			IndexedDB.update(id,"status","done");
 			if(current_status === "doing") {
-				update(id,"endtime", new Date());
+				IndexedDB.update(id,"endtime", new Date());
 			} else if (current_status === "waiting" || current_status === "undone") {
-				update(id,"starttime", new Date());
-				update(id,"endtime", new Date());
+				IndexedDB.update(id,"starttime", new Date());
+				IndexedDB.update(id,"endtime", new Date());
 			}
 		}		
 
@@ -77,14 +77,14 @@ jQuery(function($) {
 			$row.attr("status","doing");
 			$row.find("button[name=check]").removeClass().addClass("btn btn-small doing");
 			//DBヘの登録
-			update(id,"status","doing");
+			IndexedDB.update(id,"status","doing");
 			
 			$(this).find("i").removeClass("glyphicon-play").addClass("glyphicon-pause");
 			$(this).off('click',start_func);
 			$(this).on('click',pause_func);
 
 			//update処理(スタートボタンの更新）
-			update(id,"starttime",new Date(),"array");
+			IndexedDB.update(id,"starttime",new Date(),"array");
 		}
 
 
@@ -98,8 +98,8 @@ jQuery(function($) {
 			$row.find("button[name=check]").removeClass().addClass("btn btn-small waiting");
 			
 			//update処理(スタートボタンの更新）
-			update(id,"status", "waiting");
-			update(id,"endtime",new Date(),"array");
+			IndexedDB.update(id,"status", "waiting");
+			IndexedDB.update(id,"endtime",new Date(),"array");
 			//スタートボタンの設定
 			$(this).find("i").addClass("glyphicon-play").removeClass("glyphicon-pause");
 			$(this).off('click',pause_func);
@@ -117,7 +117,7 @@ jQuery(function($) {
 			$check.removeClass().addClass("btn btn-small discarded");
 			$row.find("button[name]").attr("disabled", "disabled");
 			//DBヘの登録
-			update(id,"status","discarded");
+			IndexedDB.update(id,"status","discarded");
 		}
 
 		//ボタンへのバインド処理
@@ -164,21 +164,21 @@ jQuery(function($) {
 				var data = extract_todo_info(event.data.text_sel, event.data.project_sel, event.data.duedate_sel),
 					reload_func = function() { location.reload(); return 1;};
 
-				insertDB(data,reload_func);
+				IndexedDB.insertDB(data,reload_func);
 		}
 
 		function show_todo_list(selector) {
 				//入力された情報を取得する登録
 				var content_value = {"selector" : selector},
 					append_todolist_func = append_todolist.bind(content_value);
-				readAll(append_todolist_func,bind_button_event);	
+				IndexedDB.readAll(append_todolist_func,bind_button_event);	
 		}
 		//ステータスに応じて処理を取得するための情報
 		function show_todo_list_by_status(selector, status_value) {
 				var content_value = {"selector" : selector},
 					append_todolist_func = append_todolist.bind(content_value);
 
-				readByIndex("Status",status_value,append_todolist_func,bind_button_event);	
+				IndexedDB.readByIndex("Status",status_value,append_todolist_func,bind_button_event);	
 		}
 
 		//初期表示

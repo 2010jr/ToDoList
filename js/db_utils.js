@@ -1,6 +1,8 @@
-var indexedDB = window.indexedDB ||
-	window.mozIndexedDB ||
-	window.webkitIndexedDB;
+var IndexedDB = (function () {
+
+		var indexedDB = window.indexedDB ||
+		window.mozIndexedDB ||
+		window.webkitIndexedDB;
 
 var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
 var IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
@@ -8,12 +10,12 @@ var IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 //DBに関する設定値
 var DB_NAME = "todolist";
 var INDEX_KEY = [["Name","name"],
-				 ["Tag","tag"],
-				 ["Project","project"],
-				 ["Status","status"],
-				 ["StartTime","startime"],
-				 ["EndTime","endtime"],
-				 ["DueTime","duetime"]];
+	["Tag","tag"],
+	["Project","project"],
+	["Status","status"],
+	["StartTime","startime"],
+	["EndTime","endtime"],
+	["DueTime","duetime"]];
 
 function logerror(e) {
 		alert("IndexedDB error " + e.code + " : " + e.message);
@@ -27,9 +29,9 @@ function withDB(f) {
 				var db = request.result;
 				console.log("DB version : " + db.version);
 				if (db.version === 2) {
-					apply_func(f,db);
+						apply_func(f,db);
 				} else if(db.version > 2) {
-					deleteDB();
+						deleteDB();
 				} else initDB(f);
 				console.log("finish withDB");
 		};
@@ -41,19 +43,19 @@ function insertDB(data,func) {
 		withDB(function(db) {
 				alert("invoke insert function");
 				var transaction = db.transaction(DB_NAME,"readwrite"),
-					store = transaction.objectStore(DB_NAME),
-					request = store.add({
+				store = transaction.objectStore(DB_NAME),
+				request = store.add({
 						"createdate" : new Date().getTime(),
-						"project" : data["project"],
-				   		"title" : data["title"],
-						"duedate" : data["duedate"],
-						"status" : data["status"]
-					});
-				request.onsuccess = function(e) {
-						console.log("succeed to create");
-						apply_func(func);
-				};
-				request.onerror = logerror;
+				"project" : data["project"],
+				"title" : data["title"],
+				"duedate" : data["duedate"],
+				"status" : data["status"]
+				});
+		request.onsuccess = function(e) {
+				console.log("succeed to create");
+				apply_func(func);
+		};
+		request.onerror = logerror;
 		});
 }
 
@@ -68,28 +70,28 @@ function update(key,property,value,single_or_array) {
 				var request_get = store.get(key);
 
 				request_get.onsuccess = function (e_get) {
-					var data = e_get.target.result,
-						request_put;
-					if(typeof data !== "undefined") {
-							if(typeof single_or_array === "undefined" || single_or_array === "single") {
-									data[property] = value;
-							} else if (single_or_array === "array") {
-									//初期設定の場合
-									if(typeof data[property] === "undefined") {
-											data[property] = [value];
-									} else {
-											data[property].push(value);
-									}
-							}
-					} else {
-							alert("data is not found");
-							return;
-					}
-					request_put = store.put(data);
-					request_put.onsuccess = function (e_put) {
-							console.log("update data");
-					};
-					request_put.error = logerror;
+						var data = e_get.target.result,
+				request_put;
+		if(typeof data !== "undefined") {
+				if(typeof single_or_array === "undefined" || single_or_array === "single") {
+						data[property] = value;
+				} else if (single_or_array === "array") {
+						//初期設定の場合
+						if(typeof data[property] === "undefined") {
+								data[property] = [value];
+						} else {
+								data[property].push(value);
+						}
+				}
+		} else {
+				alert("data is not found");
+				return;
+		}
+		request_put = store.put(data);
+		request_put.onsuccess = function (e_put) {
+				console.log("update data");
+		};
+		request_put.error = logerror;
 				};
 				request_get.onerror = logerror;
 		});
@@ -101,46 +103,46 @@ function readAll(func, func_end) {
 		var data_list = [];
 		withDB(function(db) {
 				var transaction = db.transaction(DB_NAME),
-					store = transaction.objectStore(DB_NAME),
-					request = store.openCursor();
+				store = transaction.objectStore(DB_NAME),
+				request = store.openCursor();
 
-				request.onsuccess = function(e) {
-					var cursor = e.target.result,
-						data;
-					if (cursor) {
-							data = apply_to_result(cursor,func);
-							data_list.push(data);
-					} else {
-						//カーソル全て終わった後の処理
-						apply_func(func_end,data_list);
-					}
-				};
+		request.onsuccess = function(e) {
+				var cursor = e.target.result,
+				data;
+		if (cursor) {
+				data = apply_to_result(cursor,func);
+				data_list.push(data);
+		} else {
+				//カーソル全て終わった後の処理
+				apply_func(func_end,data_list);
+		}
+		};
 		});
 }
 
 //あるIndexの値に一致する項目のみ取得する
 function readByIndex(search_index,search_value,func,func_end) {
-	console.log("invoke readByIndex");
-	var data_list = [];
-	withDB(function(db) {
-			var range = IDBKeyRange.only(search_value),
+		console.log("invoke readByIndex");
+		var data_list = [];
+		withDB(function(db) {
+				var range = IDBKeyRange.only(search_value),
 				transaction = db.transaction(DB_NAME),
-		    	store = transaction.objectStore(DB_NAME),
+				store = transaction.objectStore(DB_NAME),
 				index = store.index(search_index),
 				request = index.openCursor(range);
 
-			request.onsuccess = function(e) {
+		request.onsuccess = function(e) {
 				var cursor = e.target.result,
-					data;
-				if (cursor) {
-					data = apply_to_result(cursor,func);
-					data_list.push(data);
-				} else {
-					//カーソル全て終わった後の処理
-					apply_func(func_end,data_list);
-				}
-			};
-	});
+				data;
+		if (cursor) {
+				data = apply_to_result(cursor,func);
+				data_list.push(data);
+		} else {
+				//カーソル全て終わった後の処理
+				apply_func(func_end,data_list);
+		}
+		};
+		});
 }
 //ある範囲を検索
 function readByRange(search_index,search_value_from,search_value_to,lowerOpen,upperOpen,func,func_end) {
@@ -148,68 +150,68 @@ function readByRange(search_index,search_value_from,search_value_to,lowerOpen,up
 		var data_list = [];
 		withDB(function(db) {
 				var range,
-					store = db.transaction(DB_NAME).objectStore(DB_NAME),
-					index = store.index(search_index),
-					request = index.openCursor(range);
+				store = db.transaction(DB_NAME).objectStore(DB_NAME),
+				index = store.index(search_index),
+				request = index.openCursor(range);
 
-				if(typeof search_value_to === "undefined" || search_value_to === null) {
-						range = IDBKeyRange.upperBound(search_value_to,lowerOpen);
-				} else if(typeof search_value_from === "undefined" || search_value_from === null) {
-						range = IDBKeyRange.lowerBound(search_value_from,upperOpen);
-				} else {
-						range = IDBKeyRange.bound(search_value_from, search_value_to);
-				}
+		if(typeof search_value_to === "undefined" || search_value_to === null) {
+				range = IDBKeyRange.upperBound(search_value_to,lowerOpen);
+		} else if(typeof search_value_from === "undefined" || search_value_from === null) {
+				range = IDBKeyRange.lowerBound(search_value_from,upperOpen);
+		} else {
+				range = IDBKeyRange.bound(search_value_from, search_value_to);
+		}
 
 
-				request.onsuccess = function (e) {
-					var cursor = e.target.result,
-						data;
+		request.onsuccess = function (e) {
+				var cursor = e.target.result,
+				data;
 
-					if (cursor) {
-						data = apply_to_result(cursor,func);
-						data_list.push(data);
-					} else {
-						//カーソル全て終わった後の処理
-						apply_func(func_end,data_list);
-					}
-				};
+		if (cursor) {
+				data = apply_to_result(cursor,func);
+				data_list.push(data);
+		} else {
+				//カーソル全て終わった後の処理
+				apply_func(func_end,data_list);
+		}
+		};
 		});
 }	
 
 //検索
 function apply_to_result(cursor,func) {
-	var data = cursor.value;
-	apply_func(func,data);
-	cursor.continue();
-	return data;
+		var data = cursor.value;
+		apply_func(func,data);
+		cursor.continue();
+		return data;
 }
 
 
 function printConsole(data) {
-	var jsonStr;
-	if (data instanceof Array) {
-		for(var i = 0 , max = data.length ; i < max ; i++) {
-			jsonStr = JSON.stringify(data[i]);
-			console.log(jsonStr);
+		var jsonStr;
+		if (data instanceof Array) {
+				for(var i = 0 , max = data.length ; i < max ; i++) {
+						jsonStr = JSON.stringify(data[i]);
+						console.log(jsonStr);
+				}
+		} else {
+				jsonStr = JSON.stringify(data);
+				console.log(jsonStr);
 		}
-	} else {
-			jsonStr = JSON.stringify(data);
-			console.log(jsonStr);
-	}
 }
 
 function deleteObject(id) {
 		console.log("invoke deleteObject");
 		withDB(function(db) {
-			var transaction = db.transaction(DB_NAME),
+				var transaction = db.transaction(DB_NAME),
 				store = transaction.objectStore(DB_NAME),
 				request = store.delete(id);
 
-			request.onsuccess = function(e) {
+		request.onsuccess = function(e) {
 				console.log("delete object Success!! id: " + id);
-			};
-			
-			request.onerror = logerror;
+		};
+
+		request.onerror = logerror;
 		});
 }	
 
@@ -234,7 +236,7 @@ function initDB(f) {
 		request.onupgradeneeded = function(e) {
 				var db = e.target.result,
 					store = db.createObjectStore(DB_NAME,
-								{keyPath: "id", autoIncrement:true});
+									{keyPath: "id", autoIncrement:true});
 				for(var i = 0,max = INDEX_KEY.length ; i < max ; i++) {
 						store.createIndex(INDEX_KEY[i][0],INDEX_KEY[i][1]);
 						console.log(INDEX_KEY[i][0] + " create Index");
@@ -255,3 +257,16 @@ function apply_func(func,args) {
 		} 
 		return result;
 }
+	return {
+			initDB : initDB,
+			deleteObject : deleteObject,
+			deleteDB: deleteDB,
+			readByRange : readByRange,
+			readByIndex : readByIndex,
+			readAll : readAll,
+			update : update,
+			insertDB : insertDB,
+			withDB : withDB				
+		};
+}) ();
+
