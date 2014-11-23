@@ -1,4 +1,10 @@
 jQuery(function($) {
+		var todoDB = new IndexedDB({ 
+				dbName : "todolist", 
+				keyPath : "id" , 
+				isAutoInc : true, 
+				indexs : ['id','status','project','duedate']
+			});
 		$('.selectpicker').selectpicker();
 		//TODOリストのDOMを作成
 		//項目は以下6項目
@@ -59,12 +65,12 @@ jQuery(function($) {
 			//ボタンの非活性化	
 			$row.find("button[name]").attr("disabled", "disabled");
 			//DBヘの登録
-			IndexedDB.update(id,"status","done");
+			todoDB.update(id,"status","done");
 			if(current_status === "doing") {
-				IndexedDB.update(id,"endtime", new Date());
+				todoDB.update(id,"endtime", new Date());
 			} else if (current_status === "waiting" || current_status === "undone") {
-				IndexedDB.update(id,"starttime", new Date());
-				IndexedDB.update(id,"endtime", new Date());
+				todoDB.update(id,"starttime", new Date());
+				todoDB.update(id,"endtime", new Date());
 			}
 		}		
 
@@ -77,14 +83,14 @@ jQuery(function($) {
 			$row.attr("status","doing");
 			$row.find("button[name=check]").removeClass().addClass("btn btn-small doing");
 			//DBヘの登録
-			IndexedDB.update(id,"status","doing");
+			todoDB.update(id,"status","doing");
 			
 			$(this).find("i").removeClass("glyphicon-play").addClass("glyphicon-pause");
 			$(this).off('click',start_func);
 			$(this).on('click',pause_func);
 
 			//update処理(スタートボタンの更新）
-			IndexedDB.update(id,"starttime",new Date(),"array");
+			todoDB.update(id,"starttime",new Date());
 		}
 
 
@@ -98,8 +104,8 @@ jQuery(function($) {
 			$row.find("button[name=check]").removeClass().addClass("btn btn-small waiting");
 			
 			//update処理(スタートボタンの更新）
-			IndexedDB.update(id,"status", "waiting");
-			IndexedDB.update(id,"endtime",new Date(),"array");
+			todoDB.update(id,"status", "waiting");
+			todoDB.update(id,"endtime",new Date());
 			//スタートボタンの設定
 			$(this).find("i").addClass("glyphicon-play").removeClass("glyphicon-pause");
 			$(this).off('click',pause_func);
@@ -117,7 +123,7 @@ jQuery(function($) {
 			$check.removeClass().addClass("btn btn-small discarded");
 			$row.find("button[name]").attr("disabled", "disabled");
 			//DBヘの登録
-			IndexedDB.update(id,"status","discarded");
+			todoDB.update(id,"status","discarded");
 		}
 
 		//ボタンへのバインド処理
@@ -164,21 +170,22 @@ jQuery(function($) {
 				var data = extract_todo_info(event.data.text_sel, event.data.project_sel, event.data.duedate_sel),
 					reload_func = function() { location.reload(); return 1;};
 
-				IndexedDB.insertDB(data,reload_func);
+				data.create_date = new Date().getTime();
+				todoDB.insert(data,reload_func);
 		}
 
 		function show_todo_list(selector) {
 				//入力された情報を取得する登録
 				var content_value = {"selector" : selector},
 					append_todolist_func = append_todolist.bind(content_value);
-				IndexedDB.readAll(append_todolist_func,bind_button_event);	
+				todoDB.readAll(append_todolist_func,bind_button_event);	
 		}
 		//ステータスに応じて処理を取得するための情報
 		function show_todo_list_by_status(selector, status_value) {
 				var content_value = {"selector" : selector},
 					append_todolist_func = append_todolist.bind(content_value);
 
-				IndexedDB.readByIndex("Status",status_value,append_todolist_func,bind_button_event);	
+				todoDB.readByIndex("Status",status_value,append_todolist_func,bind_button_event);	
 		}
 
 		//初期表示
@@ -195,4 +202,8 @@ jQuery(function($) {
 		$(".datepicker").datepicker();
 		$(".datepicker").datepicker("option","dateFormat",'yy/mm/dd');
 		$(".datepicker").datepicker("setDate", new Date());
+
+		function getToDoData(args1,args2) {
+			todoDB.readAll(args1,args2);
+		}
 });
